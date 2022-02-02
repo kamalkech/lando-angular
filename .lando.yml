@@ -1,0 +1,24 @@
+# name: lando-angular
+# excludes:
+#   - ./node_modules
+# services:
+#   angular:
+#     type: node
+#     command: npm run start
+#     port: 4200
+#     ssl: true
+# proxy:
+#   angular:
+#     - lando-angular.lndo.site:4200
+# tooling:
+#   npm:
+#     service: angular
+#     command: npm
+
+name: lando-angular
+recipe: mean
+config:
+  webroot: .
+  port: "4200"
+  node: 14
+  command: npm run start
