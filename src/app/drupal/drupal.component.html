@@ -1,20 +1,32 @@
 <h1>Drupal API</h1>
 <div class="d-flex justify-content-center">
   <div class="spinner-border" role="status">
-    <span class="sr-only" id="loading">Loading...</span>
+    <span *ngIf="loading" class="sr-only" id="loading">Loading...</span>
   </div>
 </div>
 <table class="table" id="tab">
   <thead>
     <tr>
       <th scope="col">ID</th>
+      <th scope="col">Image</th>
       <th scope="col">Title</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let e of lis">
-      <td>{{ e.attributes.drupal_internal__nid }}</td>
-      <td>{{ e.attributes.title }}</td>
+      <td>{{ e.id }}</td>
+      <td>
+        <img [src]="e.file" alt="" />
+      </td>
+      <td>{{ e.title }}</td>
     </tr>
   </tbody>
 </table>
+<ul>
+  <li *ngIf="prev !== ''">
+    <button (click)="prevPage()">Prev</button>
+  </li>
+  <li *ngIf="next !== ''">
+    <button (click)="nextPage()">Next</button>
+  </li>
+</ul>
