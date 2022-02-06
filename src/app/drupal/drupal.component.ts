@@ -22,14 +22,14 @@ interface IArticle {
 export class DrupalComponent implements OnInit {
   li: any;
   lis: any[] = [];
-  endpoint: string = `${environment.api_endpoint}/node/article?sort=nid`;
+  endpoint: string = `${environment.api_endpoint}/node/article?sort=title`;
   loading: boolean = false;
 
   listQuota = 5;
   content = [];
   baseUrl = `${environment.api_endpoint}`;
   path = '/node/article?sort=nid';
-  pager = `&page[limit]=${this.listQuota}`;
+  pager = `&page[limit]=${this.listQuota}&include=field_image`;
   prev: string = '';
   next: string = '';
   current: string = '';
@@ -38,6 +38,8 @@ export class DrupalComponent implements OnInit {
 
   async ngOnInit(): Promise<any> {
     const url = this.baseUrl + this.path + this.pager;
+    console.log('url', url);
+    // const url = `${environment.api_endpoint}/node/article?include=field_image`;
     this.getAndSetContent(url);
   }
 
@@ -76,20 +78,28 @@ export class DrupalComponent implements OnInit {
       .then((resp) => {
         return resp.ok ? resp.json() : Promise.reject(resp.statusText);
       })
-      .then((document) => {
-        console.log('document.data', document.data);
+      .then(async (document) => {
+        console.log('document', document);
 
         let list: any[] = [];
-        Promise.all(
-          document.data.map(async (item: any) => {
-            // e.attributes.drupal_internal__nid
-            const file = await this.fetchFile(
-              item.relationships.field_image.links.related.href
+
+        await Promise.all(
+          document.data.map((node: any) => {
+            const file = document.included.filter(
+              (item: any) => item.id === node.relationships.field_image.data.id
             );
+            let url_file = '';
+            if (file.length) {
+              url_file = file[0].attributes.image_style_uri.find(
+                (element: any, index: number) =>
+                  Object.getOwnPropertyNames(element)[0] === 'thumbnail'
+              ).thumbnail;
+            }
+
             list.push({
-              id: item.attributes.drupal_internal__nid,
-              title: item.attributes.title,
-              file,
+              id: node.attributes.drupal_internal__nid,
+              title: node.attributes.title,
+              file: url_file,
             });
           })
         );
